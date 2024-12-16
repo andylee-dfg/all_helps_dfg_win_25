@@ -1,0 +1,44 @@
+# Dockerfile
+FROM dart:stable AS build
+
+WORKDIR /app
+
+# Copy pubspec files and get dependencies
+COPY pubspec.yaml .
+COPY pubspec.lock .
+RUN dart pub get
+
+# Copy Firebase configuration
+COPY firebase-credentials.json .
+
+# Copy the rest of the project
+COPY . .
+
+# Build the project
+RUN dart pub run build_runner build --delete-conflicting-outputs
+RUN dart_frog build
+RUN dart compile exe build/bin/server.dart -o build/bin/server
+
+# Create a minimal runtime image
+FROM debian:buster-slim
+
+# Install necessary SSL certificates for Firebase
+RUN apt-get update && \
+    apt-get install -y ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy the compiled binary
+COPY --from=build /app/build/bin/server /app/bin/server
+# Copy Firebase configuration
+COPY --from=build /app/firebase-credentials.json /app/firebase-credentials.json
+
+# Set environment variable for Firebase credentials
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/firebase-credentials.json
+
+# Expose the port the app runs on
+EXPOSE 8080
+
+# Run the compiled binary
+CMD ["/app/bin/server"]

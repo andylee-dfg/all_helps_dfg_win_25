@@ -1,0 +1,15 @@
+# build.yaml
+targets:
+  $default:
+    builders:
+      source_gen|combining_builder:
+        options:
+          build_extensions:
+            '^lib/{{}}.dart': 'lib/generated/{{}}.g.dart'
+            '^test/{{}}.dart': 'test/generated/{{}}.g.dart'
+            '^routes/{{}}.dart': 'routes/generated/{{}}.g.dart'
+    sources:
+      - lib/**
+      - $package$
+      - test/**
+      - routes/**

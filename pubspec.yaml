@@ -10,7 +10,8 @@ dependencies:
   dart_frog: ^1.1.0
   equatable: ^2.0.5
   json_annotation: ^4.8.0
-
+  firebase_dart: ^1.0.11
+  jaguar_jwt: ^3.0.0
 
 dev_dependencies:
   mocktail: ^1.0.3

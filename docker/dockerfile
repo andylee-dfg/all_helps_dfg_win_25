@@ -1,0 +1,23 @@
+FROM dart:stable AS build
+
+WORKDIR /app
+
+# Copy pubspec files and get dependencies
+COPY pubspec.yaml .
+COPY pubspec.lock .
+RUN dart pub get
+
+# Copy the rest of the project
+COPY . .
+
+# Build the project
+RUN dart pub run build_runner build --delete-conflicting-outputs
+RUN dart compile exe bin/server.dart -o bin/server
+
+# Create a minimal image for running
+FROM scratch
+COPY --from=build /runtime/ /
+COPY --from=build /app/bin/server /app/bin/
+
+# Expose the port the app runs on
+EXPOSE 8080

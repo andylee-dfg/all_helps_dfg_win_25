@@ -9,15 +9,23 @@ import '../../routes/index.dart' as route;
 class _MockRequestContext extends Mock implements RequestContext {}
 
 void main() {
-  group('GET /', () {
-    test('responds with a 200 and "Welcome to Dart Frog!".', () {
+  group('GET /health', () {
+    test('responds with a 200 and "ok".', () async {
       final context = _MockRequestContext();
-      final response = route.onRequest(context);
+      final response = await route.onRequest(context);
       expect(response.statusCode, equals(HttpStatus.ok));
       expect(
         response.body(),
-        completion(equals('Welcome to Dart Frog!')),
+        completion(equals('ok')),
       );
+    });
+  });
+  group('GET /v1/login', () {
+    test('responds with a 200 and "!".', () async {
+      final context = _MockRequestContext();
+      final response = await route.onRequest(context);
+      expect(response.statusCode, equals(HttpStatus.ok));
+      expect(response.body(), completion(equals('ok')));
     });
   });
 }
